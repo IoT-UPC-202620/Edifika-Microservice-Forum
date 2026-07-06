@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostCommandService postCommandService;
+    private final PostQueryService postQueryService;
 
-    public PostController(PostCommandService postCommandService) {
+    public PostController(PostCommandService postCommandService, PostQueryService postQueryService) {
         this.postCommandService = postCommandService;
+        this.postQueryService = postQueryService;
     }
 
     @PostMapping
@@ -32,5 +34,21 @@ public class PostController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> listPosts(@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> posts = postQueryService.list(pageable);
+        Page<PostResource> resources = posts.map(PostResourceFromEntityAssembler::toResourceFromEntity);
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPostById(@PathVariable Long id) {
+        return postQueryService.findById(id)
+                .map(post -> ResponseEntity.ok(PostResourceFromEntityAssembler.toResourceFromEntity(post)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found"));
     }
 }
