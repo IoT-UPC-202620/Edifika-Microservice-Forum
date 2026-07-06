@@ -3,10 +3,15 @@ package com.edifika.forum.interfaces.rest;
 import com.edifika.forum.application.internal.commandservices.PostCommandServiceImpl;
 import com.edifika.forum.domain.model.aggregates.Post;
 import com.edifika.forum.domain.services.PostCommandService;
+import com.edifika.forum.domain.services.PostQueryService;
 import com.edifika.forum.interfaces.rest.resources.CreatePostResource;
 import com.edifika.forum.interfaces.rest.resources.PostResource;
 import com.edifika.forum.interfaces.rest.transform.PostResourceFromEntityAssembler;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,8 +52,12 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable Long id) {
-        return postQueryService.findById(id)
-                .map(post -> ResponseEntity.ok(PostResourceFromEntityAssembler.toResourceFromEntity(post)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found"));
+        var maybe = postQueryService.findById(id);
+        if (maybe.isPresent()) {
+            PostResource res = PostResourceFromEntityAssembler.toResourceFromEntity(maybe.get());
+            return ResponseEntity.ok(res);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+        }
     }
 }
