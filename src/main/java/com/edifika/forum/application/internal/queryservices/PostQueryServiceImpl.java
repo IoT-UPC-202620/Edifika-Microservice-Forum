@@ -12,11 +12,14 @@ import java.util.Optional;
 
 @Service
 public class PostQueryServiceImpl implements PostQueryService {
-n    private final PostRepository postRepository;
-n    public PostQueryServiceImpl(PostRepository postRepository) {
+
+    private final PostRepository postRepository;
+
+    public PostQueryServiceImpl(PostRepository postRepository) {
         this.postRepository = postRepository;
     }
-n    @Override
+
+    @Override
     public Page<Post> list(Pageable pageable) {
         if (pageable == null) {
             pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -25,7 +28,8 @@ public class PostQueryServiceImpl implements PostQueryService {
         }
         return postRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
-n    @Override
+
+    @Override
     public Optional<Post> findById(Long id) {
         return postRepository.findById(id);
     }
