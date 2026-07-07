@@ -44,7 +44,7 @@ public class OpenApiConfiguration {
                         .url("https://docs.edifika.com"))
                 .servers(List.of(
                         new Server()
-                                .url("https://edifika-microservice-reservation.onrender.com")
+                                .url("https://edifika-microservice-forum.onrender.com")
                                 .description("Servidor de Producción (Render)"),
                         new Server()
                                 .url("http://localhost:" + serverPort)
