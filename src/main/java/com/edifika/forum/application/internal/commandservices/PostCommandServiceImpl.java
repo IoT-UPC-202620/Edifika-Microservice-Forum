@@ -1,5 +1,6 @@
 package com.edifika.forum.application.internal.commandservices;
 
+import com.edifika.forum.infrastructure.authorization.sfs.CurrentUser;
 import com.edifika.forum.domain.model.aggregates.Post;
 import com.edifika.forum.domain.services.PostCommandService; // 👈 IMPORTAMOS TU NUEVA INTERFAZ
 import com.edifika.forum.infrastructure.persistence.jpa.repositories.PostRepository;
@@ -18,8 +19,13 @@ public class PostCommandServiceImpl implements PostCommandService {
 
     @Override
     public Post handle(CreatePostResource resource, String uploadedImageUrl) {
+        // El autor sale del JWT (user_id y rol); el residentId del body se ignora.
+        Long residentId = CurrentUser.id();
+        if (residentId == null) {
+            throw new IllegalArgumentException("El token no identifica al usuario (falta user_id)");
+        }
         // Tu lógica exacta y perfecta de la restricción diaria:
-        postRepository.findFirstByResidentIdOrderByCreatedAtDesc(resource.residentId())
+        postRepository.findFirstByResidentIdOrderByCreatedAtDesc(residentId)
                 .ifPresent(lastPost -> {
                     LocalDate lastPostDate = lastPost.getCreatedAt().toLocalDate();
                     if (lastPostDate.equals(LocalDate.now())) {
@@ -30,7 +36,8 @@ public class PostCommandServiceImpl implements PostCommandService {
         Post post = new Post();
         post.setTitle(resource.title());
         post.setContent(resource.content());
-        post.setResidentId(resource.residentId());
+        post.setResidentId(residentId);
+        post.setAuthorRole(CurrentUser.role());
         post.setImageUrl(uploadedImageUrl);
 
         return postRepository.save(post);
