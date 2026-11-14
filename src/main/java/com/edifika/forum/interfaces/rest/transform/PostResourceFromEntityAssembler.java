@@ -14,7 +14,8 @@ public class PostResourceFromEntityAssembler {
                 entity.getContent(),
                 entity.getResidentId(),
                 entity.getImageUrl(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getAuthorRole()
         );
     }
 }

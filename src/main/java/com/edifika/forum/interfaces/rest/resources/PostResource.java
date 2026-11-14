@@ -8,5 +8,6 @@ public record PostResource(
         String content,
         Long residentId,
         String imageUrl,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        String authorRole
 ) {}

@@ -23,6 +23,10 @@ public class Post {
     @Column(name = "resident_id", nullable = false)
     private Long residentId;
 
+    /** Rol del autor al publicar (ADMIN, OWNER o TENANT), tomado del JWT. */
+    @Column(name = "author_role", length = 20)
+    private String authorRole;
+
     @Column(name = "image_url")
     private String imageUrl;
 
